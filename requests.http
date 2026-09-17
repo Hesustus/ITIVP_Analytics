@@ -13,14 +13,16 @@ GET {{baseUrl}}/events/1
 
 ### ============================================
 ### 3. POST /events - добавление нового события
+### ВАЖНО: visitId должен существовать в таблице visits!
 ### ============================================
 POST {{baseUrl}}/events
 Content-Type: application/json
 
 {
-    "eventType": "page_view",
-    "url": "/about",
-    "userId": "user_789"
+    "visitId": 1,
+    "eventName": "page_view",
+    "pageUrl": "/about",
+    "element": "buy-btn"
 }
 
 ### ============================================
@@ -30,9 +32,9 @@ PUT {{baseUrl}}/events/1
 Content-Type: application/json
 
 {
-    "eventType": "click",
-    "url": "/new-page",
-    "userId": "user_123"
+    "visitId": 1,
+    "eventName": "click",
+    "pageUrl": "/new-page"
 }
 
 ### ============================================
@@ -52,7 +54,7 @@ POST {{baseUrl}}/events
 Content-Type: application/json
 
 {
-    "url": "/test"
+    "pageUrl": "/test"
 }
 
 ### ============================================
