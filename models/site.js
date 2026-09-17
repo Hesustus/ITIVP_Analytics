@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Site extends Model {
     static associate(models) {
-      // M2M с пользователями
+
       Site.belongsToMany(models.User, {
         through: models.SiteUser,
         foreignKey: 'siteId',
@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
         as: 'users'
       });
 
-      // 1:M с визитами
+
       Site.hasMany(models.Visit, {
         foreignKey: 'siteId',
         as: 'visits'

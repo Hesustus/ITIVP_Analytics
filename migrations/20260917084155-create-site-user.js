@@ -30,7 +30,6 @@ module.exports = {
       }
     });
 
-    // Уникальность пары (user_id, site_id)
     await queryInterface.addConstraint('site_users', {
       fields: ['user_id', 'site_id'],
       type: 'unique',

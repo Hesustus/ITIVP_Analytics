@@ -1,10 +1,37 @@
+require('dotenv').config();
+
 const express = require('express');
-const { Event, Visit, sequelize } = require('./models');
+const { Event, User, sequelize } = require('./models');
+
+const authMiddleware = require('./middleware/auth');
+const csrfMiddleware = require('./middleware/csrf');
+const authRoutes = require('./routes/auth');
 
 const app = express();
 app.use(express.json());
 
-// GET /events — все события
+
+app.use('/auth', authRoutes);
+
+app.use(authMiddleware);
+
+app.use(csrfMiddleware);
+
+app.get('/profile', async (req, res, next) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'email', 'name', 'created_at']
+    });
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    res.json(user);
+  } catch (err) {
+    next(err);
+  }
+});
+
+
 app.get('/events', async (req, res, next) => {
   try {
     const events = await Event.findAll();
@@ -14,7 +41,6 @@ app.get('/events', async (req, res, next) => {
   }
 });
 
-// GET /events/:id — одно событие
 app.get('/events/:id', async (req, res, next) => {
   try {
     const event = await Event.findByPk(req.params.id);
@@ -27,7 +53,7 @@ app.get('/events/:id', async (req, res, next) => {
   }
 });
 
-// POST /events — создать
+
 app.post('/events', async (req, res, next) => {
   try {
     const { visitId, eventName, pageUrl, element } = req.body;
@@ -48,13 +74,12 @@ app.post('/events', async (req, res, next) => {
   }
 });
 
-// PUT /events/:id — обновить
 app.put('/events/:id', async (req, res, next) => {
   try {
-    const { visitId, eventName, pageUrl } = req.body;
+    const { visitId, eventName, pageUrl, element } = req.body;
 
     const [updated] = await Event.update(
-      { visitId, eventName, pageUrl },
+      { visitId, eventName, pageUrl, element },
       { where: { id: req.params.id } }
     );
 
@@ -69,7 +94,7 @@ app.put('/events/:id', async (req, res, next) => {
   }
 });
 
-// DELETE /events/:id — удалить
+
 app.delete('/events/:id', async (req, res, next) => {
   try {
     const deleted = await Event.destroy({
@@ -86,32 +111,20 @@ app.delete('/events/:id', async (req, res, next) => {
   }
 });
 
-// 404
+
 app.use((req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });
 });
 
-// Обработчик ошибок
+
 app.use((err, req, res, next) => {
   console.error(err.message);
   res.status(500).json({ error: 'Внутренняя ошибка сервера' });
 });
 
-const authMiddleware = require('./middleware/auth');
-const { User } = require('./models');
-
-app.get('/profile', authMiddleware, async (req, res, next) => {
-  try {
-    const user = await User.findByPk(req.user.id, {
-      attributes: ['id', 'email', 'name', 'created_at']
-    });
-    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
-    res.json(user);
-  } catch (err) {
-    next(err);
-  }
-});
-
 
 const port = 5500;
-app.listen(port, () => console.log(`Server running on http://localhost:${port}`));
+
+app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });

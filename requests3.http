@@ -1,0 +1,119 @@
+### Базовый URL
+@baseUrl = http://localhost:5500
+
+
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@test.ru",
+    "password": "secret123",
+    "name": "Тестовый пользователь"
+}
+###############################################
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@test.ru",
+    "password": "secret123"
+}
+###############################################
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJ0ZXN0QHRlc3QucnUiLCJpYXQiOjE3ODk2NTQwMjUsImV4cCI6MTc4OTY1NzYyNX0.4u73tIYrZ4gMytrJ0dod-P5vTSe3IF3V5DDvTgDeYrE
+@csrf = 3070318563e998075257a3ea8fef5395c48b8e245e67b79d4b0b5f3f5caa651a
+###############################################
+GET {{baseUrl}}/profile
+Authorization: Bearer {{token}}
+###############################################
+GET {{baseUrl}}/profile
+###############################################
+
+###############################################
+GET {{baseUrl}}/events
+Authorization: Bearer {{token}}
+
+###############################################
+GET {{baseUrl}}/events/1
+Authorization: Bearer {{token}}
+###############################################
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{
+    "visitId": 1,
+    "eventName": "click",
+    "pageUrl": "/checkout",
+    "element": "buy-btn"
+}
+
+###############################################
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "visitId": 1,
+    "eventName": "click",
+    "pageUrl": "/checkout"
+}
+
+###############################################
+POST {{baseUrl}}/events
+Authorization: Bearer {{token}}
+X-CSRF-Token: неправильный_токен
+Content-Type: application/json
+
+{
+    "visitId": 1,
+    "eventName": "click",
+    "pageUrl": "/checkout"
+}
+
+###############################################
+PUT {{baseUrl}}/events/1
+Authorization: Bearer {{token}}
+X-CSRF-Token: {{csrf}}
+Content-Type: application/json
+
+{
+    "visitId": 1,
+    "eventName": "purchase",
+    "pageUrl": "/checkout",
+    "element": "buy-btn"
+}
+
+###############################################
+DELETE {{baseUrl}}/events/1
+Authorization: Bearer {{token}}
+X-CSRF-Token: {{csrf}}
+
+###############################################
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "test@test.ru",
+    "password": "secret123"
+}
+
+###############################################
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "test@test.ru",
+    "password": "wrong_password"
+}
+
+###############################################
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "password": "secret123"
+}
+
+###############################################
+GET {{baseUrl}}/nonexistent
