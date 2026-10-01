@@ -1,0 +1,57 @@
+.app {
+  max-width: 800px;
+  margin: 2rem auto;
+  font-family: system-ui, sans-serif;
+  padding: 0 1rem;
+}
+
+h1 { margin-bottom: 1.5rem; }
+
+.stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.stat-card {
+  background: #f3f4f6;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+}
+.stat-card.active { background: #dcfce7; }
+.stat-card.inactive { background: #fee2e2; }
+.stat-value { font-size: 1.5rem; font-weight: bold; }
+.stat-label { font-size: 0.85rem; color: #555; }
+
+.site-form, .controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+.site-form input, .controls input { flex: 1; padding: 0.5rem; }
+.controls select { padding: 0.5rem; }
+
+.sites { list-style: none; padding: 0; }
+.site-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+.site-item .domain { color: #6b7280; margin-left: 0.75rem; }
+.site-item .status {
+  font-size: 0.75rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-left: 0.75rem;
+}
+.status.active { background: #dcfce7; color: #166534; }
+.status.inactive { background: #fee2e2; color: #991b1b; }
+
+.actions button { margin-left: 0.25rem; }
+.loader { text-align: center; padding: 3rem; font-size: 1.2rem; color: #666; }
+.empty { text-align: center; color: #999; padding: 2rem; }
