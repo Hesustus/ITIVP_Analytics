@@ -19,8 +19,8 @@ Content-Type: application/json
     "password": "secret123"
 }
 ###############################################
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJ0ZXN0QHRlc3QucnUiLCJpYXQiOjE3ODk2NTQwMjUsImV4cCI6MTc4OTY1NzYyNX0.4u73tIYrZ4gMytrJ0dod-P5vTSe3IF3V5DDvTgDeYrE
-@csrf = 3070318563e998075257a3ea8fef5395c48b8e245e67b79d4b0b5f3f5caa651a
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJ0ZXN0QHRlc3QucnUiLCJpYXQiOjE3ODk2NjQ0MTgsImV4cCI6MTc4OTY2ODAxOH0.1MufNfFMihFArBdh1j7mfdE14lOr-T2qMULGtP6QhuM
+@csrf = 3324dd130265d2fe9fbdd123e5679a98d819098ff4917fb973a40addef455239
 ###############################################
 GET {{baseUrl}}/profile
 Authorization: Bearer {{token}}

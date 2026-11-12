@@ -6,7 +6,9 @@ export function SiteItem({ site, onDelete, onUpdate }) {
   const [name, setName] = useState(site.name);
   const [domain, setDomain] = useState(site.domain);
 
-  const eventsCount = site.events?.length || 0;
+  const visits = site.visits || [];
+  const allEvents = visits.flatMap(v => v.events || []);
+  const eventsCount = allEvents.length;
 
   const handleSave = () => {
     if (!name.trim() || !domain.trim()) return;
@@ -14,75 +16,73 @@ export function SiteItem({ site, onDelete, onUpdate }) {
     setIsEditing(false);
   };
 
-  const handleCancel = () => {
-    setName(site.name);
-    setDomain(site.domain);
-    setIsEditing(false);
-  };
-
   if (isEditing) {
     return (
-      <li className="site-item editing">
-        <input value={name} onChange={(e) => setName(e.target.value)} />
-        <input value={domain} onChange={(e) => setDomain(e.target.value)} />
-        <button onClick={handleSave}>Сохранить</button>
-        <button onClick={handleCancel}>Отмена</button>
-      </li>
+      <div className="site-card editing">
+        <div className="edit-form">
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Название" />
+          <input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="Домен" />
+          <div className="edit-actions">
+            <button className="btn btn-primary" onClick={handleSave}>Сохранить</button>
+            <button className="btn btn-ghost" onClick={() => setIsEditing(false)}>Отмена</button>
+          </div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <li className="site-item">
-      <div className="site-header" onClick={() => setIsExpanded(v => !v)}>
-        <span className="toggle">{isExpanded ? '▼' : '▶'}</span>
-        <strong>{site.name}</strong>
-        <span className="domain">{site.domain}</span>
-        <span className="events-badge">
-          {eventsCount} {declOfNum(eventsCount, ['событие', 'события', 'событий'])}
-        </span>
-
-        <div className="actions" onClick={(e) => e.stopPropagation()}>
-          <button onClick={() => setIsEditing(true)} title="Редактировать">Редактировать</button>
-          <button onClick={() => onDelete(site.id)} title="Удалить">Удалить</button>
+    <div className={`site-card ${site._pending ? 'pending' : ''} ${isExpanded ? 'expanded' : ''}`}>
+      <div className="card-header" onClick={() => setIsExpanded(v => !v)}>
+        <div className="card-title">
+          <h3>{site.name}</h3>
+          <span className="domain">{site.domain}</span>
         </div>
+        <div className="card-meta">
+          <span className="badge">{eventsCount} событий</span>
+        </div>
+        <div className="card-actions" onClick={e => e.stopPropagation()}>
+          <button className="icon-btn" onClick={() => setIsEditing(true)} title="Редактировать">✏️</button>
+          <button className="icon-btn" onClick={() => onDelete(site.id)} title="Удалить">🗑️</button>
+        </div>
+        <div className="expand-icon">{isExpanded ? '▲' : '▼'}</div>
       </div>
 
       {isExpanded && (
-        <div className="events-panel">
-          {eventsCount === 0 ? (
-            <p className="empty-events">У этого сайта пока нет событий</p>
+        <div className="card-body">
+          <div className="visits-summary">
+            <span>Визитов: <b>{visits.length}</b></span>
+            <span>Событий: <b>{eventsCount}</b></span>
+          </div>
+          
+          {visits.length === 0 ? (
+            <p className="empty-text">У этого сайта нет визитов</p>
           ) : (
-            <table className="events-table">
-              <thead>
-                <tr>
-                  <th>Событие</th>
-                  <th>Страница</th>
-                  <th>Элемент</th>
-                  <th>Дата</th>
-                </tr>
-              </thead>
-              <tbody>
-                {site.events.map(ev => (
-                  <tr key={ev.id}>
-                    <td><span className={`event-name ${ev.eventName}`}>{ev.eventName}</span></td>
-                    <td>{ev.pageUrl}</td>
-                    <td>{ev.element || '—'}</td>
-                    <td>{new Date(ev.createdAt).toLocaleString('ru-RU')}</td>
+            <div className="table-wrapper">
+              <table className="events-table">
+                <thead>
+                  <tr>
+                    <th>Событие</th>
+                    <th>Страница</th>
+                    <th>Элемент</th>
+                    <th>Дата</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {allEvents.map(ev => (
+                    <tr key={ev.id}>
+                      <td><span className={`tag ${ev.event_name}`}>{ev.event_name}</span></td>
+                      <td className="text-truncate">{ev.page_url || '—'}</td>
+                      <td>{ev.element || '—'}</td>
+                      <td className="text-muted">{new Date(ev.created_at).toLocaleString('ru-RU', { dateStyle: 'short', timeStyle: 'short' })}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
-    </li>
+    </div>
   );
-}
-
-function declOfNum(n, forms) {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return forms[0];
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1];
-  return forms[2];
 }

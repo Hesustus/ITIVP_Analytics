@@ -14,8 +14,8 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 
 app.use(authMiddleware);
-
 app.use(csrfMiddleware);
+
 
 app.get('/profile', async (req, res, next) => {
   try {

@@ -6,7 +6,6 @@ const { User } = require('../models');
 
 const router = express.Router();
 
-// POST /auth/register
 router.post('/register', async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
@@ -34,7 +33,6 @@ router.post('/register', async (req, res, next) => {
   }
 });
 
-// POST /auth/login
 router.post('/login', async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -59,7 +57,6 @@ router.post('/login', async (req, res, next) => {
       { expiresIn: '1h' }
     );
 
-    // CSRF-токен — генерируем при логине, сохраняем в БД
     const csrfToken = crypto.randomBytes(32).toString('hex');
     user.csrfToken = csrfToken;
     await user.save();
