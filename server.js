@@ -1,37 +1,38 @@
+const dns = require('dns');
+dns.setServers(['8.8.8.8', '1.1.1.1']);
+
+
 require('dotenv').config();
 const cors = require('cors');
 const express = require('express');
 const { Event, User, sequelize } = require('./models');
-
+const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth');
 const sitesRoutes = require('./routes/sites');
 const authMiddleware = require('./middleware/auth');
 const csrfMiddleware = require('./middleware/csrf');
 
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('✅ MongoDB connected'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ============================================
-// 1. ПУБЛИЧНЫЕ РОУТЫ (без токена)
-// ============================================
+
 app.use('/auth', authRoutes);
 
-// ============================================
-// 2. ВСЁ НИЖЕ — ТОЛЬКО С JWT
-// ============================================
+
 app.use(authMiddleware);
 
-// ============================================
-// 3. ВСЁ НИЖЕ — С CSRF (для POST/PUT/DELETE)
-// ============================================
+
 app.use(csrfMiddleware);
 
-// ============================================
-// 4. ЗАЩИЩЁННЫЕ РОУТЫ
-// ============================================
+const mongoSitesRoutes = require('./routes/mongoSites');
+app.use('/mongo-sites', mongoSitesRoutes);
 
-// Профиль
+
 app.get('/profile', async (req, res, next) => {
   try {
     const user = await User.findByPk(req.user.id, {
@@ -44,12 +45,9 @@ app.get('/profile', async (req, res, next) => {
   }
 });
 
-// Сайты (CRUD + поиск + пагинация)
+
 app.use('/sites', sitesRoutes);
 
-// ============================================
-// 5. EVENTS (CRUD)
-// ============================================
 
 app.get('/events', async (req, res, next) => {
   try {
@@ -103,24 +101,17 @@ app.delete('/events/:id', async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// ============================================
-// 6. 404 — В САМОМ КОНЦЕ, ПОСЛЕ ВСЕХ РОУТОВ
-// ============================================
 app.use((req, res) => {
   res.status(404).json({ error: 'Маршрут не найден' });
 });
 
-// ============================================
-// 7. ОБРАБОТЧИК ОШИБОК — ПОСЛЕДНИМ
-// ============================================
+
 app.use((err, req, res, next) => {
   console.error('❌', err.message);
   res.status(500).json({ error: 'Внутренняя ошибка сервера' });
 });
 
-// ============================================
-// 8. ЗАПУСК
-// ============================================
+
 const port = 5500;
 (async () => {
   try {

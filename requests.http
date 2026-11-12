@@ -1,40 +1,50 @@
-
 @baseUrl = http://localhost:5500
 
-GET {{baseUrl}}/events
 
-GET {{baseUrl}}/events/1
-
-POST {{baseUrl}}/events
+# @name login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "visitId": 1,
-    "eventName": "page_view",
-    "pageUrl": "/about",
-    "element": "buy-btn"
+    "email": "ivan@mail.ru",
+    "password": "password123"
 }
 
-PUT {{baseUrl}}/events/2
+# @name createSite
+POST {{baseUrl}}/mongo-sites
+Authorization: Bearer {{login.response.body.token}}
+X-CSRF-Token: {{login.response.body.csrfToken}}
 Content-Type: application/json
 
 {
-    "visitId": 2,
-    "eventName": "clicsusk",
-    "pageUrl": "/new-page"
+  "name": "Mongo GitHub",
+  "domain": "github.com"
 }
 
-DELETE {{baseUrl}}/events/1
 
-
-GET {{baseUrl}}/events/999
-
-
-POST {{baseUrl}}/events
+# @name createVisit
+POST {{baseUrl}}/mongo-sites/{{createSite.response.body._id}}/visits
+Authorization: Bearer {{login.response.body.token}}
+X-CSRF-Token: {{login.response.body.csrfToken}}
 Content-Type: application/json
 
 {
-    "pageUrl": "/test"
+  "visitorId": "mongo-user-1",
+  "pageUrl": "/home",
+  "referrer": "google.com"
 }
 
-GET {{baseUrl}}/test
+
+POST {{baseUrl}}/mongo-sites/{{createSite.response.body._id}}/visits/{{createVisit.response.body.visits[0]._id}}/events
+Authorization: Bearer {{login.response.body.token}}
+X-CSRF-Token: {{login.response.body.csrfToken}}
+Content-Type: application/json
+
+{
+  "eventName": "click",
+  "pageUrl": "/pricing",
+  "element": "buy-btn"
+}
+
+GET {{baseUrl}}/mongo-sites
+Authorization: Bearer {{login.response.body.token}}
